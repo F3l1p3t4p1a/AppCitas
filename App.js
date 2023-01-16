@@ -1,17 +1,44 @@
-import React, {useState} from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableHighlight, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import { StyleSheet, Text, View, FlatList, TouchableHighlight, TouchableWithoutFeedback, Keyboard, ScrollView } from 'react-native';
 import Cita from './components/Cita';
 import Formulario from './components/Formulario';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function App() {
   const [mostrarForm, setMostarForm] = useState(false);
   const [citas, setCitas] = useState([]);
 
+
+  useEffect(() => {
+  const obtenerCitasStorage = async () => {
+
+    try {
+      const citasStorage = await AsyncStorage.getItem('citas');
+
+      if(citasStorage){
+        setCitas(JSON.parse(citasStorage));
+      }
+      
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
+
+  obtenerCitasStorage();
+
+  }, []);
+  
+
   const eliminarPaciente = id => {
-    setCitas((citasActuales) => {
-        return citasActuales.filter( cita => cita.id !== id);
-    })
+
+    const citasFiltradas = citas.filter( cita => cita.id !== id);
+
+    setCitas(citasFiltradas);
+    guardarCitasStorage(JSON.stringify(citasFiltradas));
+
+    
   }
 
   // Mostrar u ocultar formulario
@@ -29,7 +56,22 @@ const cerrarTeclado = () => {
 
 }
 
+
+// guardar las citas en storage
+
+const guardarCitasStorage = async (citasJson) => {
+
+  try {
+    await AsyncStorage.setItem('citas', citasJson);
+  } catch (error) {
+    
+  }
+  
+}
+
   return (
+
+    
     <TouchableWithoutFeedback onPress={() => cerrarTeclado()}>
     <View style={styles.container}>
       <Text style={styles.titulo}>Citas Medicas</Text>
@@ -40,7 +82,12 @@ const cerrarTeclado = () => {
       {mostrarForm ? (
         <>
           <Text style={styles.titulo}>Crear nuevas citas</Text>
-          <Formulario citas={citas} setCitas={setCitas} setMostarForm={setMostarForm}/>
+          <Formulario 
+            citas={citas} 
+            setCitas={setCitas} 
+            setMostarForm={setMostarForm}
+            guardarCitasStorage={guardarCitasStorage}
+          />
         </>
         
       ): (
@@ -64,6 +111,8 @@ const cerrarTeclado = () => {
     </View>
 
     </TouchableWithoutFeedback>
+    
+    
   );
 }
 

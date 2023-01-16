@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableHighlight } from 'react-native'
+import { StyleSheet, Text, View, TouchableHighlight, ScrollView } from 'react-native'
 import React from 'react'
 
 export default function Cita({item, eliminarPaciente}) {
@@ -8,6 +8,7 @@ export default function Cita({item, eliminarPaciente}) {
     eliminarPaciente(id);
   }
   return (
+    <ScrollView>
     <View style={styles.contenedor}>
       <View>
         <Text style={styles.label}>paciente :</Text>
@@ -28,6 +29,7 @@ export default function Cita({item, eliminarPaciente}) {
       </View>
       
     </View>
+    </ScrollView>
   )
 }
 
